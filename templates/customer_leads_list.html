@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Leads List | MLEASD.COM{% endblock %}
+{% block meta_description %}View and manage customer leads{% endblock %}
+{% block meta_author %}Your Name{% endblock %}
+{% block meta_keywords %}Customer Leads, Management{% endblock %}
+
+{% block content %}
+<div class="row row-sm">
+    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12 grid-margin">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="card-title mb-0">Customer Leads</h6>
+                <div class="d-flex align-items-center">
+                    <!-- User filter dropdown -->
+                    <form method="GET" action="{{ url_for('customer_leads_list') }}" class="me-3">
+                        <div class="form-group mb-0">
+                            <select name="selected_user_id" id="selected_user_id" class="form-control" onchange="this.form.submit();">
+                                <option value="all" {% if selected_user_id == 'all' %}selected{% endif %}>All Users</option>
+                                {% for user in users %}
+                                <option value="{{ user.user_id }}" {% if user.user_id == (selected_user_id | default(0) | int) %}selected{% endif %}>
+                                    {{ user.first_name }} {{ user.last_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                    <a href="{{ url_for('create_leads') }}" class="btn btn-primary">Create New Leads</a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive userlist-table">
+                    <table class="table card-table table-striped table-vcenter text-nowrap mb-0">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Lead ID</th>
+                                <th>Customer Name</th>
+                                <th>Phone No</th>
+                                <th>Related</th>
+                                <th>Created User</th>
+                                <th>Created Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if leads %}
+                            {% for lead_info in leads %}
+                            <tr>
+                                <td><input type="checkbox" name="selected_leads" value="{{ lead_info.lead.lead_id }}"></td>
+                                <td>{{ lead_info.lead.lead_id }}</td>
+                                <td>{{ lead_info.customer.full_name if lead_info.customer else 'No Customer' }}</td>
+                                <td>{{ lead_info.customer.phone_no if lead_info.customer else 'N/A' }}</td>
+                                <td>{{ lead_info.lead.inquiry_type }}</td>
+                                <td>{{ lead_info.user.first_name if lead_info.user else 'Unknown' }}</td>
+                                <td>{{ lead_info.lead.date.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <span class="badge {{ lead_info.status_class }}">
+                                        <span class="text-white">{{ lead_info.status_label }}</span>
+                                    </span>
+                                </td>
+                                <td>    
+                                    <a href="{{ url_for('update_leads', lead_id=lead_info.lead.lead_id) }}" class="btn btn-sm btn-info">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="9">No leads found.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    {% if session.company_id and session.user_id %}
+                    <div>
+                        <label for="target_user_id">Transfer to:</label>
+                        <select name="target_user_id" id="target_user_id" class="form-control">
+                            {% for user in users %}
+                            <option value="{{ user.user_id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Transfer Selected Leads</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

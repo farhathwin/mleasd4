@@ -1,0 +1,88 @@
+
+
+{% extends "base.html" %}
+
+{% block title %}Update Leads | MLEASD.COM{% endblock %}
+{% block meta_description %}View and manage customer leads{% endblock %}
+{% block meta_author %}Your Name{% endblock %}
+{% block meta_keywords %}Customer Leads, Management{% endblock %}
+
+{% block content %}
+<div>
+    <!-- Lead ID Header with White Background -->
+    <div class="card mb-2">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Lead - ID: {{ lead.lead_id }}</h2>
+            <button onclick="window.history.back();" class="btn btn-outline-secondary">Back</button>
+        </div>
+    </div>
+
+    <!-- Customer Details Card -->
+    <div class="card">
+        <div class="card-header">
+            Customer Details
+        </div>
+        <div class="card-body">
+            <form method="POST" action="">
+                <div class="mb-3">
+                    <label for="customerName" class="form-label">Customer Name</label>
+                    <input type="text" id="customerName" value="{{ lead.customer.full_name if lead.customer else 'No Customer' }}" class="form-control" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email ID</label>
+                    <input type="email" id="email" value="{{ lead.customer.email if lead.customer else 'No Email' }}" class="form-control" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="phoneNo" class="form-label">Phone No</label>
+                    <input type="text" id="phoneNo" value="{{ lead.customer.phone_no if lead.customer else 'No Phone Number' }}" class="form-control" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="inquiry_type" class="form-label">Lead Type</label>
+                    <input type="text" id="inquiry_type" value="{{ lead.inquiry_type }}" class="form-control" readonly>
+                </div>
+                
+                <!-- Show Lead Status Dropdown only for Admins -->
+                {% if 'Admin' in roles or 'Supervisor' in roles or 'Team Leader' in roles or 'User' in roles %}
+                <div class="mb-3">
+                    <label for="lead_status" class="form-label">Lead Status</label>
+                    <select id="lead_status" name="lead_status" class="form-control">
+                        <option value="1" {% if lead.is_leads == 1 %}selected{% endif %}>In Progress</option>
+                        <option value="2" {% if lead.is_leads == 2 %}selected{% endif %}>Need to Follow Up</option>
+                        <option value="0" {% if lead.is_leads == 0 %}selected{% endif %}>Converted</option>
+                        <option value="3" {% if lead.is_leads == 3 %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+                {% else %}
+                <p>You do not have permission to update lead status.</p>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Comment</label>
+                    <textarea id="comment" name="comment" class="form-control"></textarea>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Update Comment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    {% if comments %}
+    <div class="mt-4">
+        <h5>Comments:</h5>
+        {% for comment in comments %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <p class="mb-1">{{ comment.comment }}</p>
+                <small class="text-muted">Posted by {{ comment.user.first_name }} {{ comment.user.last_name }} on {{ comment.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No comments to display.</p>
+    {% endif %}
+</div>
+{% endblock %}

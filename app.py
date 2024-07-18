@@ -1237,7 +1237,7 @@ app.register_blueprint(leads_bp)
 
 def init_roles():
     with app.app_context():
-        roles = ['Admin', 'Supervisor', 'Team Leader', 'User']
+        roles = ['Supper User','Admin', 'Supervisor', 'Team Leader', 'User']
         for role_name in roles:
             role = Role.query.filter_by(name=role_name).first()
             if role is None:
